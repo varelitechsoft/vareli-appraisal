@@ -1,0 +1,5 @@
+Code.gs
+*.gs
+apps-script/
+*.xlsx
+.claude/
