@@ -115,7 +115,7 @@
   function init(schema) {
     const main = $("main");
     const holder = main.innerHTML;
-    main.innerHTML = '<header class="formhead"><h1>Checking your link…</h1></header>';
+    main.innerHTML = '<div class="loader" role="status"><div class="spin"></div>Checking your link…</div>';
     gate(schema).then((g) => { main.innerHTML = holder; start(schema, g); })
       .catch((e) => blockPage(e.message, e.soft));
   }
@@ -277,7 +277,7 @@
     }
 
     const btn = $("#submitBtn");
-    btn.disabled = true; btn.textContent = "Submitting…";
+    btn.disabled = true; btn.classList.add("busy"); btn.textContent = "Submitting…";
     const payload = { form: schema.id, period: window.HR_CONFIG.PERIOD, submittedAt: new Date().toISOString(), id: who.id, key: who.key, data: collect(form), labels: headingsFor(schema) };
     delete payload.data.declaration;
 
@@ -285,7 +285,7 @@
       store.del(draftKey);
       showDone(res.ref, res.demo, who);
     }).catch((e) => {
-      btn.disabled = false; btn.textContent = "Submit";
+      btn.disabled = false; btn.classList.remove("busy"); btn.textContent = "Submit";
       banner.textContent = e.message || "Could not submit. Check your connection and try again. Your answers are saved on this device.";
       banner.classList.add("show");
       banner.scrollIntoView({ behavior: "smooth", block: "center" });

@@ -154,3 +154,11 @@ button.ghost { font: inherit; background: none; border: 1.5px solid var(--line);
 .grid2 > .field { display: grid; grid-template-rows: subgrid; grid-row: span 3; row-gap: 0; align-content: start; }
 
 [hidden] { display: none !important; }
+/* loader */
+.loader { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 48px 16px; color: var(--muted); font-weight: 500; }
+.spin, button.primary.busy::before { width: 22px; height: 22px; border: 3px solid rgba(34,85,158,.2); border-top-color: var(--teal); border-radius: 50%; animation: spin .8s linear infinite; }
+.loader .spin { width: 38px; height: 38px; border-width: 4px; }
+button.primary.busy { display: inline-flex; align-items: center; gap: 10px; }
+button.primary.busy::before { content: ""; width: 16px; height: 16px; border-width: 2px; border-color: rgba(255,255,255,.4); border-top-color: #fff; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spin, button.primary.busy::before { animation-duration: 2.4s; } }
