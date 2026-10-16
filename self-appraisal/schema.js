@@ -1,5 +1,7 @@
 window.SCHEMA = {
   id: "self",
+  idField: "empId",
+  nameField: "empName",
   sections: [
     {
       title: "Employee information", short: "Your details", grid: true,

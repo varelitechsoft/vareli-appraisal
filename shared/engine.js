@@ -87,8 +87,37 @@
     return `<details class="guide"><summary>${esc(g.title)}</summary><dl>${g.items.map((x) => `<dt>${esc(x[0])}</dt><dd>${esc(x[1])}</dd>`).join("")}</dl></details>`;
   }
 
+  // Personal link: ?id=<EmployeeID>&key=<secret>. The page checks it with the script before showing the form.
+  function gate(schema) {
+    const q = new URLSearchParams(location.search);
+    const who = { id: (q.get("id") || "").trim(), key: (q.get("key") || "").trim() };
+    const url = window.HR_CONFIG.SCRIPT_URL;
+    if (!url) return Promise.resolve({ who, name: who.id ? "Demo User" : "" , demo: true });
+    const bad = (m) => { const e = new Error(m); e.blocked = true; return e; };
+    if (!who.id || !who.key) return Promise.reject(bad("This form opens only from your personal link. Please use the link HR sent you."));
+    return fetch(url + "?action=verify&id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key))
+      .then((r) => r.json())
+      .then((j) => { if (!j.ok) throw bad(j.error || "This link is not valid. Please contact HR.");
+        return { who, name: j.name }; })
+      .catch((e) => { throw e.blocked ? e : bad("Could not check your link. Check your connection and reload the page."); });
+  }
+
+  function blockPage(msg) {
+    const main = $("main");
+    main.innerHTML = `<header class="formhead"><h1>Link not valid</h1><p>${esc(msg)}</p></header>`;
+    const nav = $(".progress"); if (nav) nav.hidden = true;
+  }
+
   function init(schema) {
-    const draftKey = "hr_draft_" + schema.id;
+    const main = $("main");
+    const holder = main.innerHTML;
+    main.innerHTML = '<header class="formhead"><h1>Checking your link…</h1></header>';
+    gate(schema).then((g) => { main.innerHTML = holder; start(schema, g); })
+      .catch((e) => blockPage(e.message));
+  }
+
+  function start(schema, g) {
+    const draftKey = "hr_draft_" + schema.id + "_" + (g.who.id || "demo");
     const form = $("#form");
     form.innerHTML = build(schema);
     $("#sectionNav").innerHTML = schema.sections.map((s, i) =>
@@ -104,6 +133,13 @@
       const saved = JSON.parse(store.get(draftKey) || "null");
       if (saved) Object.entries(saved).forEach(([k, v]) => setValue(form, k, v));
     } catch (e) {}
+    // lock the identity fields to the person the link belongs to
+    if (!g.demo || g.who.id) {
+      [[schema.idField, g.who.id], [schema.nameField, g.name]].forEach(([k, v]) => {
+        const el = form.elements[k];
+        if (el) { el.value = v; el.readOnly = true; }
+      });
+    }
     updateCaptions(form);
     refresh();
 
@@ -138,7 +174,7 @@
     }, { rootMargin: "-20% 0px -70% 0px" });
     document.querySelectorAll(".sec").forEach((s) => io.observe(s));
 
-    $("#submitBtn").addEventListener("click", () => submit(schema, form, draftKey));
+    $("#submitBtn").addEventListener("click", () => submit(schema, form, draftKey, g.who));
     $("#clearBtn").addEventListener("click", () => {
       if (confirm("Clear everything you have entered on this form?")) { store.del(draftKey); location.reload(); }
     });
@@ -202,7 +238,7 @@
     return h;
   }
 
-  function submit(schema, form, draftKey) {
+  function submit(schema, form, draftKey, who) {
     const banner = $("#errBanner");
     banner.classList.remove("show");
     let first = null;
@@ -236,7 +272,7 @@
 
     const btn = $("#submitBtn");
     btn.disabled = true; btn.textContent = "Submitting…";
-    const payload = { form: schema.id, period: window.HR_CONFIG.PERIOD, submittedAt: new Date().toISOString(), data: collect(form), labels: headingsFor(schema) };
+    const payload = { form: schema.id, period: window.HR_CONFIG.PERIOD, submittedAt: new Date().toISOString(), id: who.id, key: who.key, data: collect(form), labels: headingsFor(schema) };
     delete payload.data.declaration;
 
     send(payload).then((res) => {

@@ -14,23 +14,45 @@
 <header class="brandbar"><div class="in"><a href="https://www.vareli.co.in/" aria-label="Vareli Tecnac website"><img src="shared/img/logo.png" alt="Vareli Tecnac Pvt. Ltd."></a><div class="meta"><a href="https://www.vareli.co.in/">vareli.co.in</a></div></div></header>
 <section class="hero"><div class="in">
   <h1>Half-yearly appraisal</h1>
-  <p class="period">April 2026 – September 2026. Choose the form that applies to you.</p>
+  <p class="period" id="greet">April 2026 – September 2026. Open the personal link HR sent you.</p>
 </div></section>
 <main class="landing" id="main">
-  <div class="entries">
-    <a class="entry" href="self-appraisal/index.html">
-      <h2>I'm an employee</h2>
+  <div class="entries" id="entries" hidden>
+    <a class="entry" id="selfLink" href="self-appraisal/index.html">
+      <h2>My self-assessment</h2>
       <p>Reflect on your last six months and rate your own performance, wellbeing and the support you received.</p>
       <span class="go">Start self-assessment</span>
     </a>
-    <a class="entry" href="supervisor/index.html">
-      <h2>I'm a supervisor</h2>
+    <a class="entry" id="supLink" href="supervisor/index.html">
+      <h2>Assess my team members</h2>
       <p>Assess a team member's performance, skills, wellbeing and collaboration for the same period.</p>
       <span class="go">Start supervisor assessment</span>
     </a>
   </div>
+  <p class="notes" id="bad" hidden></p>
   <p class="notes">Answers are saved on your device while you type, so you can close the page and return. Supervisors complete their assessment independently and do not see the employee's answers. Only HR sees submitted responses.</p>
 </main>
+<script src="shared/config.js"></script>
+<script>
+(function () {
+  var q = new URLSearchParams(location.search), id = (q.get("id") || "").trim(), key = (q.get("key") || "").trim();
+  var qs = "?id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key);
+  var url = window.HR_CONFIG.SCRIPT_URL;
+  function bad(m) { var b = document.getElementById("bad"); b.textContent = m; b.hidden = false; }
+  function show(name) {
+    document.getElementById("greet").textContent = "Welcome" + (name ? ", " + name : "") + ". Choose the form to fill.";
+    document.getElementById("selfLink").href = "self-appraisal/index.html" + qs;
+    var s = document.getElementById("supLink"); s.href = "supervisor/index.html" + qs; 
+    document.getElementById("entries").hidden = false;
+  }
+  if (!url) return show("");
+  if (!id || !key) return bad("This page opens only from your personal link. Please use the link HR sent you.");
+  fetch(url + "?action=verify&id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key))
+    .then(function (r) { return r.json(); })
+    .then(function (j) { if (j.ok) show(j.name); else bad(j.error || "This link is not valid. Please contact HR."); })
+    .catch(function () { bad("Could not check your link. Check your connection and reload the page."); });
+})();
+</script>
 <footer class="sitefoot">© Vareli Tecnac Pvt. Ltd.</footer>
 </body>
 </html>
