@@ -102,6 +102,10 @@
       .catch((e) => { throw e.blocked ? e : bad("Could not check your link. Check your connection and reload the page."); });
   }
 
+  function backUrl(who) {
+    return "../index.html" + (who && who.id ? "?id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key) : "");
+  }
+
   function blockPage(msg) {
     const main = $("main");
     main.innerHTML = `<header class="formhead"><h1>Link not valid</h1><p>${esc(msg)}</p></header>`;
@@ -119,6 +123,8 @@
   function start(schema, g) {
     const draftKey = "hr_draft_" + schema.id + "_" + (g.who.id || "demo");
     const form = $("#form");
+    // keep the personal link when going back to the "All forms" page
+    document.querySelectorAll('a[href="../index.html"]').forEach((a) => { a.href = backUrl(g.who); });
     form.innerHTML = build(schema);
     $("#sectionNav").innerHTML = schema.sections.map((s, i) =>
       `<li><a href="#sec${i}" data-nav="${i}"><span class="tick"></span>${esc(s.short)}</a></li>`).join("");
@@ -277,7 +283,7 @@
 
     send(payload).then((res) => {
       store.del(draftKey);
-      showDone(res.ref, res.demo);
+      showDone(res.ref, res.demo, who);
     }).catch((e) => {
       btn.disabled = false; btn.textContent = "Submit";
       banner.textContent = e.message || "Could not submit. Check your connection and try again. Your answers are saved on this device.";
@@ -298,13 +304,13 @@
       .then((j) => { if (!j.ok) throw new Error(j.error || "The server rejected this submission."); return { ref: j.ref }; });
   }
 
-  function showDone(ref, demo) {
+  function showDone(ref, demo, who) {
     document.body.innerHTML = `<main class="done" id="main">
       <h1>Submission received</h1>
       <p>Thank you. Your ${demo ? "demo " : ""}response has been recorded.</p>
       <div class="ref">Reference: ${esc(ref)}</div>
       ${demo ? "<p>Demo mode: nothing was sent to HR. The live link is not connected yet.</p>" : "<p>You can close this page. Please keep the reference number.</p>"}
-      <p><a href="../index.html">Back to start</a></p></main>`;
+      <p><a href="${backUrl(who)}">Back to start</a></p></main>`;
     window.scrollTo(0, 0);
   }
 

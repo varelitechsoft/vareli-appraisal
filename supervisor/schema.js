@@ -82,9 +82,7 @@ window.SCHEMA = {
       fields: [
         { key: "supName", type: "text", label: "Supervisor name" },
         { key: "supId", header: "Supervisor Employee ID", type: "text", label: "Supervisor Employee ID", sub: "Your own ID. It is checked against the employee list." },
-        { key: "signature", header: "Supervisor signature", type: "text", label: "Supervisor signature (type full name)" },
         { key: "signDate", header: "Sign-off date", type: "date", label: "Date" },
-        { key: "reviewerSignature", header: "Second signature (if required)", type: "text", label: "Second signature (if required)", optional: true },
       ],
       declaration: "I confirm that this assessment is based on my own observation of the employee's performance during the period.",
     },
