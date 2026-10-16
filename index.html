@@ -52,7 +52,8 @@
   if (!url) return show("", true);
   if (!id || !key) return bad("This page opens only from your personal link. Please use the link HR sent you.");
   function check() { return fetch(url + "?action=verify&id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key)).then(function (r) { return r.json(); }); }
-  check().catch(function () { return new Promise(function (r) { setTimeout(r, 1200); }).then(check); })
+  function again() { return new Promise(function (r) { setTimeout(r, 1200); }).then(check); }
+  check().catch(again).catch(again)
     .then(function (j) { if (j.ok) show(j.name, j.isSupervisor); else bad(j.error || "This link is not valid. Please contact HR."); })
     .catch(function () { bad("Could not check your link. Check your connection and reload the page."); });
 })();

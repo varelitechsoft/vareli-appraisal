@@ -96,7 +96,8 @@
     const bad = (m, soft) => { const e = new Error(m); e.blocked = true; e.soft = !!soft; return e; };
     if (!who.id || !who.key) return Promise.reject(bad("This form opens only from your personal link. Please use the link HR sent you."));
     const check = () => fetch(url + "?action=verify&id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key)).then((r) => r.json());
-    return check().catch(() => new Promise((res) => setTimeout(res, 1200)).then(check))
+    const wait = () => new Promise((res) => setTimeout(res, 1200));
+    return check().catch(() => wait().then(check)).catch(() => wait().then(check))
       .then((j) => { if (!j.ok) throw bad(j.error || "This link is not valid. Please contact HR.");
         if (schema.id === "supervisor" && !j.isSupervisor) throw bad("The supervisor form is not enabled for your ID. Please contact HR.");
         return { who, name: j.name }; })
