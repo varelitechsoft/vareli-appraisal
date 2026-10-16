@@ -24,7 +24,7 @@
       <p>Reflect on your last six months and rate your own performance, wellbeing and the support you received.</p>
       <span class="go">Start self-assessment</span>
     </a>
-    <a class="entry" id="supLink" href="supervisor/index.html">
+    <a class="entry" id="supLink" href="supervisor/index.html" hidden>
       <h2>Assess my team members</h2>
       <p>Assess a team member's performance, skills, wellbeing and collaboration for the same period.</p>
       <span class="go">Start supervisor assessment</span>
@@ -44,15 +44,16 @@
   document.getElementById("supLink").href = "supervisor/index.html" + qs;
   function done() { document.getElementById("loader").hidden = true; }
   function bad(m) { done(); var b = document.getElementById("bad"); b.textContent = m; b.hidden = false; }
-  function show(name) {
+  function show(name, sup) {
     document.getElementById("greet").textContent = "Welcome" + (name ? ", " + name : "") + ". Choose the form to fill.";
+    document.getElementById("supLink").hidden = !sup;
     done(); document.getElementById("entries").hidden = false;
   }
-  if (!url) return show("");
+  if (!url) return show("", true);
   if (!id || !key) return bad("This page opens only from your personal link. Please use the link HR sent you.");
   function check() { return fetch(url + "?action=verify&id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key)).then(function (r) { return r.json(); }); }
   check().catch(function () { return new Promise(function (r) { setTimeout(r, 1200); }).then(check); })
-    .then(function (j) { if (j.ok) show(j.name); else bad(j.error || "This link is not valid. Please contact HR."); })
+    .then(function (j) { if (j.ok) show(j.name, j.isSupervisor); else bad(j.error || "This link is not valid. Please contact HR."); })
     .catch(function () { bad("Could not check your link. Check your connection and reload the page."); });
 })();
 </script>

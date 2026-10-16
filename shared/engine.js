@@ -98,6 +98,7 @@
     const check = () => fetch(url + "?action=verify&id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key)).then((r) => r.json());
     return check().catch(() => new Promise((res) => setTimeout(res, 1200)).then(check))
       .then((j) => { if (!j.ok) throw bad(j.error || "This link is not valid. Please contact HR.");
+        if (schema.id === "supervisor" && !j.isSupervisor) throw bad("The supervisor form is not enabled for your ID. Please contact HR.");
         return { who, name: j.name }; })
       .catch((e) => { throw e.blocked ? e : bad("Could not check your link. Check your connection and reload the page.", true); });
   }
