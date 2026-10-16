@@ -81,7 +81,7 @@ window.SCHEMA = {
       title: "Sign-off", short: "Sign-off", grid: true,
       fields: [
         { key: "supName", type: "text", label: "Supervisor name" },
-        { key: "supId", header: "Supervisor Employee ID", type: "text", label: "Supervisor Employee ID", sub: "Your own ID. It is checked against the employee list." },
+        { key: "supId", header: "Supervisor Employee ID", type: "text", label: "Supervisor Employee ID", sub: "Filled in from your personal link." },
         { key: "signDate", header: "Sign-off date", type: "date", label: "Date" },
       ],
       declaration: "I confirm that this assessment is based on my own observation of the employee's performance during the period.",

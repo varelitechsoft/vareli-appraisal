@@ -44,8 +44,6 @@
   function bad(m) { var b = document.getElementById("bad"); b.textContent = m; b.hidden = false; }
   function show(name) {
     document.getElementById("greet").textContent = "Welcome" + (name ? ", " + name : "") + ". Choose the form to fill.";
-    document.getElementById("selfLink").href = "self-appraisal/index.html" + qs;
-    var s = document.getElementById("supLink"); s.href = "supervisor/index.html" + qs; 
     document.getElementById("entries").hidden = false;
   }
   if (!url) return show("");

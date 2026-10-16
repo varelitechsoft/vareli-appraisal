@@ -93,22 +93,22 @@
     const who = { id: (q.get("id") || "").trim(), key: (q.get("key") || "").trim() };
     const url = window.HR_CONFIG.SCRIPT_URL;
     if (!url) return Promise.resolve({ who, name: who.id ? "Demo User" : "" , demo: true });
-    const bad = (m) => { const e = new Error(m); e.blocked = true; return e; };
+    const bad = (m, soft) => { const e = new Error(m); e.blocked = true; e.soft = !!soft; return e; };
     if (!who.id || !who.key) return Promise.reject(bad("This form opens only from your personal link. Please use the link HR sent you."));
     const check = () => fetch(url + "?action=verify&id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key)).then((r) => r.json());
     return check().catch(() => new Promise((res) => setTimeout(res, 1200)).then(check))
       .then((j) => { if (!j.ok) throw bad(j.error || "This link is not valid. Please contact HR.");
         return { who, name: j.name }; })
-      .catch((e) => { throw e.blocked ? e : bad("Could not check your link. Check your connection and reload the page."); });
+      .catch((e) => { throw e.blocked ? e : bad("Could not check your link. Check your connection and reload the page.", true); });
   }
 
   function backUrl(who) {
     return "../index.html" + (who && who.id ? "?id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key) : "");
   }
 
-  function blockPage(msg) {
+  function blockPage(msg, soft) {
     const main = $("main");
-    main.innerHTML = `<header class="formhead"><h1>Link not valid</h1><p>${esc(msg)}</p></header>`;
+    main.innerHTML = `<header class="formhead"><h1>${soft ? "Could not check your link" : "Link not valid"}</h1><p>${esc(msg)}</p></header>`;
     const nav = $(".progress"); if (nav) nav.hidden = true;
   }
 
@@ -117,7 +117,7 @@
     const holder = main.innerHTML;
     main.innerHTML = '<header class="formhead"><h1>Checking your link…</h1></header>';
     gate(schema).then((g) => { main.innerHTML = holder; start(schema, g); })
-      .catch((e) => blockPage(e.message));
+      .catch((e) => blockPage(e.message, e.soft));
   }
 
   function start(schema, g) {
@@ -143,7 +143,7 @@
     if (!g.demo || g.who.id) {
       [[schema.idField, g.who.id], [schema.nameField, g.name]].forEach(([k, v]) => {
         const el = form.elements[k];
-        if (el) { el.value = v; el.readOnly = true; }
+        if (el && v) { el.value = v; el.readOnly = true; }
       });
     }
     updateCaptions(form);
