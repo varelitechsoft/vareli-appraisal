@@ -38,6 +38,9 @@
   var q = new URLSearchParams(location.search), id = (q.get("id") || "").trim(), key = (q.get("key") || "").trim();
   var qs = "?id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key);
   var url = window.HR_CONFIG.SCRIPT_URL;
+  // the buttons always carry the personal link, even before / without the check
+  document.getElementById("selfLink").href = "self-appraisal/index.html" + qs;
+  document.getElementById("supLink").href = "supervisor/index.html" + qs;
   function bad(m) { var b = document.getElementById("bad"); b.textContent = m; b.hidden = false; }
   function show(name) {
     document.getElementById("greet").textContent = "Welcome" + (name ? ", " + name : "") + ". Choose the form to fill.";
@@ -47,8 +50,8 @@
   }
   if (!url) return show("");
   if (!id || !key) return bad("This page opens only from your personal link. Please use the link HR sent you.");
-  fetch(url + "?action=verify&id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key))
-    .then(function (r) { return r.json(); })
+  function check() { return fetch(url + "?action=verify&id=" + encodeURIComponent(id) + "&key=" + encodeURIComponent(key)).then(function (r) { return r.json(); }); }
+  check().catch(function () { return new Promise(function (r) { setTimeout(r, 1200); }).then(check); })
     .then(function (j) { if (j.ok) show(j.name); else bad(j.error || "This link is not valid. Please contact HR."); })
     .catch(function () { bad("Could not check your link. Check your connection and reload the page."); });
 })();

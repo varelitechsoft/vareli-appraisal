@@ -95,8 +95,8 @@
     if (!url) return Promise.resolve({ who, name: who.id ? "Demo User" : "" , demo: true });
     const bad = (m) => { const e = new Error(m); e.blocked = true; return e; };
     if (!who.id || !who.key) return Promise.reject(bad("This form opens only from your personal link. Please use the link HR sent you."));
-    return fetch(url + "?action=verify&id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key))
-      .then((r) => r.json())
+    const check = () => fetch(url + "?action=verify&id=" + encodeURIComponent(who.id) + "&key=" + encodeURIComponent(who.key)).then((r) => r.json());
+    return check().catch(() => new Promise((res) => setTimeout(res, 1200)).then(check))
       .then((j) => { if (!j.ok) throw bad(j.error || "This link is not valid. Please contact HR.");
         return { who, name: j.name }; })
       .catch((e) => { throw e.blocked ? e : bad("Could not check your link. Check your connection and reload the page."); });

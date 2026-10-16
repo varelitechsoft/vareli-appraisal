@@ -152,3 +152,5 @@ button.ghost { font: inherit; background: none; border: 1.5px solid var(--line);
 /* align labels, inputs and error lines across a row even when a label wraps */
 .grid2 { row-gap: 0; }
 .grid2 > .field { display: grid; grid-template-rows: subgrid; grid-row: span 3; row-gap: 0; align-content: start; }
+
+[hidden] { display: none !important; }
