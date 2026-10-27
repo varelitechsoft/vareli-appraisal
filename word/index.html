@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Create Word files - HR</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../shared/img/favicon.ico">
+<style>
+  :root { --blue:#22559e; --navy:#1f3254; --line:#d5deec; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:Poppins,Arial,sans-serif; color:#222; background:#f4f7fb; }
+  .bar { background:#fff; border-bottom:3px solid var(--blue); padding:12px 24px; }
+  .bar img { height:36px; }
+  main { max-width:760px; margin:28px auto; padding:0 16px; }
+  h1 { color:var(--navy); font-size:1.5rem; margin:0 0 4px; }
+  .sub { color:#555f6d; margin:0 0 20px; font-size:.92rem; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:16px; }
+  .card h2 { font-size:1rem; color:var(--blue); margin:0 0 10px; }
+  .choice { display:flex; gap:12px; flex-wrap:wrap; }
+  .choice label { flex:1; min-width:220px; border:2px solid var(--line); border-radius:10px; padding:12px 14px; cursor:pointer; font-weight:500; }
+  .choice input { margin-right:8px; }
+  .choice label:has(input:checked) { border-color:var(--blue); background:#eaf0f9; }
+  input[type=file] { width:100%; padding:10px; border:2px dashed var(--line); border-radius:10px; background:#fafcff; font-family:inherit; }
+  .tools { display:flex; gap:10px; align-items:center; margin-bottom:8px; flex-wrap:wrap; }
+  .tools button { background:none; border:1px solid var(--line); border-radius:8px; padding:5px 12px; cursor:pointer; font-family:inherit; color:var(--navy); }
+  select { font-family:inherit; padding:5px 8px; border:1px solid var(--line); border-radius:8px; max-width:100%; }
+  #count { margin-left:auto; color:#555f6d; font-size:.88rem; }
+  #list { max-height:320px; overflow:auto; border:1px solid var(--line); border-radius:8px; }
+  .row { display:flex; gap:10px; padding:6px 12px; border-bottom:1px solid #eef2f8; font-size:.9rem; cursor:pointer; }
+  .row:last-child { border-bottom:0; }
+  #make { background:var(--blue); color:#fff; border:0; border-radius:10px; padding:12px 22px; font-family:inherit; font-size:1rem; font-weight:600; cursor:pointer; margin-top:14px; }
+  #make:disabled { opacity:.5; cursor:not-allowed; }
+  .msg { margin-top:10px; font-size:.92rem; color:var(--navy); min-height:1.2em; }
+  .msg.bad { color:#b3261e; font-weight:500; }
+  .note { font-size:.82rem; color:#555f6d; }
+</style>
+</head>
+<body>
+<div class="bar"><img src="../shared/img/logo.png" alt="Vareli Tecnac Pvt. Ltd."></div>
+<main>
+  <h1>Create Word files</h1>
+  <p class="sub">Turn the exported Excel sheet into a short, easy-to-read Word document for each employee.</p>
+
+  <div class="card">
+    <h2>Step 1 - Which form is the Excel file?</h2>
+    <div class="choice">
+      <label><input type="radio" name="kind" value="self" checked> Self Appraisal</label>
+      <label><input type="radio" name="kind" value="supervisor"> Supervisor Assessment</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Step 2 - Choose the Excel file</h2>
+    <input type="file" id="file" accept=".xlsx,.xls,.csv">
+    <p class="note">In Google Sheets: File &gt; Download &gt; Microsoft Excel (.xlsx). The file stays on this computer; nothing is uploaded.</p>
+    <div class="msg" id="msg" role="status"></div>
+  </div>
+
+  <div class="card" id="step2" hidden>
+    <h2>Step 3 - Pick people and create</h2>
+    <div class="tools" id="filterRow" hidden>
+      <label for="supFilter">Supervisor:</label>
+      <select id="supFilter"></select>
+    </div>
+    <div class="tools">
+      <button type="button" id="all">Select all</button>
+      <button type="button" id="none">Clear</button>
+      <span id="count"></span>
+    </div>
+    <div id="list"></div>
+    <button type="button" id="make">Create Word files</button>
+    <p class="note">One person gives a single .docx. Several people give one ZIP with a .docx for each.</p>
+  </div>
+</main>
+<script src="lib/xlsx.full.min.js"></script>
+<script src="lib/jszip.min.js"></script>
+<script src="lib/docx.js"></script>
+<script src="lib/logo.js"></script>
+<script src="word.js"></script>
+</body>
+</html>
